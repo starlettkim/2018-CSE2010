@@ -1,19 +1,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef int KeyType;
 typedef struct Node {
-	int key;
+	KeyType key;
 	struct Node *next;
 } Node;
 
+/* Makes empty singly linked list.
+ * Returns	pointer of head node	when succeeded,
+ *			null pointer			when failed with allocating memory.
+ */
+Node* makeEmptyList() {
+	return (Node*)malloc(sizeof(Node));
+}
+
+/* Finds the previous node of the node with arg[key].
+ * Returns	pointer of the node	when succeeded,
+ *			null pointer		when failed.
+ */
+Node* findPrevious(Node *head, KeyType key) {
+	Node *np = head;
+	while (np->next != NULL && np->next->key != key) {
+		np = np->next;
+	}
+	if (np->next == NULL) {
+		return NULL;
+	}
+	return np;
+}
+
+/* Finds the node with arg[key].
+ * Returns	pointer of the node	when succeeded,
+ *			null pointer		when failed.
+ */
+Node* find(Node *head, KeyType key) {
+	Node *np = findPrevious(head, key);
+	return (np == NULL ? NULL : np->next);
+}
+
 /* Insert the key next to the first node that has prev_key.
  * If prev_key is -1, insert the key next to the header node.
- * Returns 0 when succeeded, -1 when failed.
+ * Returns	0 when succeeded,
+ *			1 when failed to allocate memory,
+ *			2 when prev_key is not found.
  */
-int insert(Node *head, int key, int prev_key) {
+int insert(Node *head, KeyType key, KeyType prev_key) {
 	Node *newNode = (Node*)malloc(sizeof(Node));
 	if (newNode == NULL) {
-		return -1;
+		return 1;
 	}
 	newNode->key = key;
 
@@ -21,12 +56,9 @@ int insert(Node *head, int key, int prev_key) {
 		newNode->next = head->next;
 		head->next = newNode;
 	} else {
-		Node *np = head->next;
-		while (np != NULL && np->key != prev_key) {
-			np = np->next;
-		}
+		Node *np = find(head, key);
 		if (np == NULL) {	// prev_key not found
-			return -1;
+			return 2;
 		}
 		newNode->next = np->next;
 		np->next = newNode;	
@@ -36,9 +68,10 @@ int insert(Node *head, int key, int prev_key) {
 }
 
 /* Delete the node with the key.
- * Returns 0 when succeeded, -1 when failed.
+ * Returns	0 when succeeded,
+ *			1 when key is not found.
  */
-int delete(Node *head, int key) {
+int delete(Node *head, KeyType key) {
 	Node *pnp = head;		// previous node pointer
 	Node *cnp = head->next;	// current node pointer
 	while (cnp != NULL && cnp->key != key) {
@@ -46,27 +79,15 @@ int delete(Node *head, int key) {
 		cnp = cnp->next;
 	}
 	if (cnp == NULL) {	// key not found
-		return -1;
+		return 1;
 	}
 	pnp->next = cnp->next;
 	free(cnp);
 	return 0;
 }
 
-/* Print the key of the previous node of the node with the key.
- * Returns key of the previous node when succeeded, -1 when failed.
+/* Prints entire list by using standard output.
  */
-int findPrevious(Node *head, int key) {
-	Node *np = head;
-	while (np->next != NULL && np->next->key != key) {
-		np = np->next;
-	}
-	if (np->next == NULL || np == head) {
-		return -1;
-	}
-	return np->key;
-}
-
 void printList(Node *head) {
 	Node *np = head->next;
 	while (np != NULL) {
@@ -83,20 +104,29 @@ int main(int argc, char **argv) {
 	}
 
 	FILE *ifp = fopen(argv[1], "r");
-	Node *head = (Node*)malloc(sizeof(Node));
-	if (ifp == NULL || head == NULL) {
-		fprintf(stderr, "Error\n");
+	if (ifp == NULL) {
+		fprintf(stderr, "Error while opening file: %s\n", argv[1]);
+		return 1;
+	}
+
+	Node *head = makeEmptyList();
+	if (head == NULL) {
+		fprintf(stderr, "Failed to make empty list.\n");
 		return 1;
 	}
 
 	char cmd;
 	while (fscanf(ifp, "%c", &cmd) != EOF) {
-		int key, prev_key;
+		KeyType key, prev_key;
 		if (cmd == 'i') {
 			fscanf(ifp, "%d %d", &key, &prev_key);
-			if (insert(head, key, prev_key) == -1) {
-				printf("Insertion(%d) failed.\n", key);
+			int ret = insert(head, key, prev_key);
+			if (ret == 1) {
+				printf("Insertion failed with key(%d): Cannot allocate memory\n", key);
+			} else if (ret == 2) {
+				printf("Insertion failed with key(%d): Cannot find the key(%d).\n", key, prev_key);
 			}
+
 		} else if (cmd == 'd') {
 			fscanf(ifp, "%d", &key);
 			if (delete(head, key) == -1) {
