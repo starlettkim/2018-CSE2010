@@ -17,6 +17,12 @@ Node* makeEmptyList() {
 	return head;
 }
 
+void deleteList(Node *head) {
+	if (head == NULL) return;
+	deleteList(head->next);
+	free(head);
+}
+
 int isEmptyList(Node *head) {
 	return head->next == NULL;
 }
@@ -162,5 +168,6 @@ int main(int argc, char **argv) {
 		}
 	}
 	
+	deleteList(head);
 	return 0;
 }
