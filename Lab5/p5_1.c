@@ -36,6 +36,15 @@ void printInorder(Tree *root) {
 	}
 }
 
+void deleteTree(Tree *root) {
+	if (root == NULL) {
+		return;
+	}
+	deleteTree(root->left);
+	deleteTree(root->right);
+	free(root);
+}
+
 int main(int argc, char **argv) {
 	FILE *ifp;
 	if (argc == 1) {
@@ -60,5 +69,6 @@ int main(int argc, char **argv) {
 	}
 	printf("\n");
 
+	deleteTree(root);
 	return 0;
 }
