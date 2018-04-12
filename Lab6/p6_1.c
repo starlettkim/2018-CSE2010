@@ -3,14 +3,15 @@
 
 #define MAX(a, b) (a > b ? a : b)
 
+struct AVLNode;
+typedef struct AVLNode* AVLTree;
 typedef int	ElementType;
 typedef struct AVLNode {
 	ElementType element;
-	struct AVLNode *left;
-	struct AVLNode *right;
+	AVLTree left;
+	AVLTree right;
 	int height;
 } AVLNode;
-typedef AVLNode* AVLTree;
 
 AVLTree insertNode(ElementType X, AVLTree T) {
 	if (T == NULL) {
