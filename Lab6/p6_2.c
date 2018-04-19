@@ -71,7 +71,7 @@ AVLTree insertNode(ElementType X, AVLTree T) {
 		fprintf(stderr, "Insertion error: There is already %d in the tree.\n", X);
 	}
 	
-	// Rebalance
+	// Rebalance the tree.
 	if (getHeightDiff(T) > 1) {
 		if (getHeightDiff(T->left) > 0)	{
 			T = singleRotateWithRight(T);
