@@ -5,6 +5,7 @@
 
 struct AVLNode;
 typedef struct AVLNode* AVLTree;
+typedef struct AVLNode* Position;
 typedef int	ElementType;
 typedef struct AVLNode {
 	ElementType element;
@@ -12,6 +13,36 @@ typedef struct AVLNode {
 	AVLTree right;
 	int height;
 } AVLNode;
+
+Position singleRotateWithLeft(Position node) {
+	Position child = node->right;
+	node->right = child->left;
+	child->left = node;
+	return child;
+}
+
+Position singleRotateWithRight(Position node) {
+	Position child = node->left;
+	node->left = child->right;
+	child->right = node;
+	return child;
+}
+
+Position doubleRotateWithLeft(Position node) {
+	Position child = node->right;
+	node->right = singleRotateWithRight(child);
+	return singleRotateWithLeft(node);
+}
+
+Position doubleRotateWithRight(Position node) {
+	Position child = node->left;
+	node->left = singleRotateWithLeft(child);
+	return singleRotateWithRight(node);
+}
+
+int getHeight(Position node) {
+	return node == NULL ? -1 : node->height;
+}
 
 AVLTree insertNode(ElementType X, AVLTree T) {
 	if (T == NULL) {
