@@ -61,6 +61,7 @@ void dfs(DisjointSets *sets, char wall[], int num, int cur_pos, char visit[]) {
 			unionSets(sets, cur_pos, NEXT_POS);
 			dfs(sets, wall, num, NEXT_POS, visit);
 		}
+		#undef NEXT_POS
 	}
 }
 
@@ -72,19 +73,30 @@ void createMaze(DisjointSets *sets, char wall[], int num) {
 
 void printMaze(char wall[], int num) {
 	int i, j;
-	for (i = 0; i < num; i++) printf(" ─");
-	printf("\n");
-	#define NOW (i * num + j)
+	printf("┌───");
+	for (i = 1; i < num; i++) {
+		printf("%s───", wall[i - 1] & 1 ? "─" : "┬");
+	}
+	printf("┐\n");
 	for (i = 0; i < num; i++) {
+		#define NOW (i * num + j)
 		printf("%s", i ? "│" : " ");
 		for (j = 0; j < num; j++) {
-			printf(" %s", wall[NOW] & 1 ? " " : "|");
+			printf("   %s", wall[NOW] & 1 ? " " : "│");
 		}
 		printf("\n");
-		for (j = 0; j < num; j++) {
-			printf(" %s", wall[NOW] >> 1 ? " " : "─");
+		char print_map[16][5] = { "ERR", "─", "│", "┌", "─", "─",
+			"┐", "┬", "│", "└", "│", "├", "┘", "┴", "┤", "┼"};
+		for (j = 0; j <= num; j++) {
+			int print_value = 0;
+			print_value |= (j != num && ((i == num - 1) || (wall[NOW] >> 1 == 0))) << 0;
+			print_value |= (i != num - 1 && (j == 0 || j == num || (wall[NOW + num - 1] & 1) == 0)) << 1;
+			print_value |= (j && ((i == num - 1) || (wall[NOW - 1] >> 1 == 0))) << 2;
+			print_value |= (j == 0 || j == num || (wall[NOW - 1] & 1) == 0) << 3;
+			printf("%s%s", print_map[print_value], (j == num || wall[NOW] >> 1) ? "   " : "───");
 		}
 		printf("\n");
+		#undef NOW
 	}
 }
 
