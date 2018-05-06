@@ -29,7 +29,6 @@ void unionSets(DisjointSets *sets, int i, int j) {
 	sets->array[find(sets, sets->array[i])] = find(sets, sets->array[j]);
 }
 
-// TODO: DFS로 Generate하니까 미로가 너무 쉬워짐.. 해결방법을 찾는 중
 void dfs(DisjointSets *sets, char wall[], int num, int cur_pos, int step) {
 	if (cur_pos == num * num - 1) {
 		wall[cur_pos] |= 1;
