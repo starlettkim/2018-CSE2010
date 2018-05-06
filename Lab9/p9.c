@@ -30,12 +30,12 @@ void unionSets(DisjointSets *sets, int i, int j) {
 }
 
 // TODO: DFS로 Generate하니까 미로가 너무 쉬워짐.. 해결방법을 찾는 중
-void dfs(DisjointSets *sets, char wall[], int num, int cur_pos) {
+void dfs(DisjointSets *sets, char wall[], int num, int cur_pos, int step) {
 	if (cur_pos == num * num - 1) {
 		wall[cur_pos] |= 1;
-		return;
+		if (step) return;
 	}
-	if (rand() % (num / 2) == 0) {
+	if (step && rand() % (num / 2) == 0) {
 		return;
 	}
 
@@ -62,7 +62,7 @@ void dfs(DisjointSets *sets, char wall[], int num, int cur_pos) {
 			else if (dir[num_dir] == -1)   wall[NEXT_POS] |= 1;
 			else if (dir[num_dir] == -num) wall[NEXT_POS] |= 1 << 1; 
 			unionSets(sets, cur_pos, NEXT_POS);
-			dfs(sets, wall, num, NEXT_POS);
+			dfs(sets, wall, num, NEXT_POS, 1);
 		}
 		#undef NEXT_POS
 	}
@@ -70,14 +70,19 @@ void dfs(DisjointSets *sets, char wall[], int num, int cur_pos) {
 
 // (pseudo-)Randomly create maze using DFS with disjoint sets.
 void createMaze(DisjointSets *sets, char wall[], int num) {
-	int i, j;
-	for (i = 0; i < num; i++) {
-		for (j = 0; j < num; j++) {
-			#define NOW (i * num + j)
-			if (find(sets, 0) != find(sets, NOW)) {
-				dfs(sets, wall, num, NOW);
-			}
-			#undef NOW
+	int *nums = (int*)calloc(num * num, sizeof(int));
+	int size_nums = num * num;
+	int i;
+	for (i = 0; i < num * num; i++) {
+		nums[i] = i;
+	}
+	while (size_nums != 0) {
+		int now = rand() % size_nums--;
+		int tmp = nums[now];
+		nums[now] = nums[size_nums];
+		nums[size_nums] = tmp;
+		if (find(sets, 0) != find(sets, nums[size_nums])) {
+			dfs(sets, wall, num, nums[size_nums], 0);
 		}
 	}
 }
