@@ -95,6 +95,10 @@ void printShortestPath(Graph *graph) {
 
 	int end;
 	for (end = 2; end <= graph->size; end++) {
+		if (graph->nodes[end].prev == end) {
+			printf("Cannot reach to node %d.\n", end);
+			continue;
+		}
 		int *stack = calloc(graph->size, sizeof(int));
 		int idx = 0, now = end;
 		while (now != 1) {
