@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Graph {
 	int num;
@@ -70,22 +71,12 @@ void closeQueue(Queue *queue) {
 	free(queue);
 }
 
-int main(int argc, char *argv[]) {
-	FILE *ifp = fopen(argv[1], "r");
-	Graph *graph = makeGraph(ifp);
-	
-	int start, end;
-	char c = 0;
-	while (c != '\n') {
-		fscanf(ifp, " %d-%d%c", &start, &end, &c);
-		if (start < 1 || start > graph->num || end < 1 || end > graph->num) continue;
-		graph->weight[start][end] = 1;
-	}
-	fscanf(ifp, " %d-%d", &start, &end);
-
+void BFS(Graph *graph, int start, int end) {
 	printf("BFS:");
-	if (start < 1 || start > graph->num)
+	if (start < 1 || start > graph->num) {
 		printf(" cannot find");
+		return;
+	}
 	Queue *queue = createQueue(graph->num);
 	enQueue(queue, start);
 	graph->check_visit[start] = 1;
@@ -107,5 +98,22 @@ int main(int argc, char *argv[]) {
 		printf(" cannot find");
 	printf("\n");
 	closeQueue(queue);
+	memset(graph->check_visit, 0, graph->num * sizeof(int));
+}
+
+int main(int argc, char *argv[]) {
+	FILE *ifp = fopen(argv[1], "r");
+	Graph *graph = makeGraph(ifp);
+	
+	int start, end;
+	char c = 0;
+	while (c != '\n') {
+		fscanf(ifp, " %d-%d%c", &start, &end, &c);
+		if (start < 1 || start > graph->num || end < 1 || end > graph->num) continue;
+		graph->weight[start][end] = 1;
+	}
+	fscanf(ifp, " %d-%d", &start, &end);
+
+	BFS(graph, start, end);
 	return 0;
 }
