@@ -106,5 +106,6 @@ int main(int argc, char *argv[]) {
 	if (end < 1 || end > graph->num || now != end)
 		printf(" cannot find");
 	printf("\n");
+	closeQueue(queue);
 	return 0;
 }
